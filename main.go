@@ -11,6 +11,10 @@ import (
 	flag "github.com/ogier/pflag"
 )
 
+var (
+	Version = "No version specified"
+)
+
 const (
 	exitCodeOk             int = 0
 	exitCodeError          int = 1
@@ -18,13 +22,26 @@ const (
 	exitCodeAWSError
 )
 
+const helpString = `Usage:
+  dkv [-hiv] [--table=dynamo_table] [--delete=key] [--region=region] [key=value]
+
+Flags:
+  -d, --help    Print this help message
+  -h, --help    Print this help message
+  -r, --region  The AWS region the table is in
+  -t, --table   The name of the DynamoDB table
+  -v, --version Print the version number
+`
+
 var (
 	f = flag.NewFlagSet("flags", flag.ContinueOnError)
 
 	// options
-	deleteFlag = f.StringP("delete", "d", "", "Delete a key")
-	regionFlag = f.StringP("region", "r", "us-east-1", "The AWS region")
-	tableFlag  = f.StringP("table", "t", "", "The Dynamo table")
+	deleteFlag  = f.StringP("delete", "d", "", "Delete a key")
+	helpFlag    = f.BoolP("help", "h", false, "Show help")
+	regionFlag  = f.StringP("region", "r", "us-east-1", "The AWS region")
+	tableFlag   = f.StringP("table", "t", "", "The Dynamo table")
+	versionFlag = f.BoolP("version", "v", false, "Print the version")
 )
 
 type Item struct {
@@ -32,18 +49,25 @@ type Item struct {
 	Value string
 }
 
-// type DynamoClient interface {
-// 	Scan(input *dynamodb.ScanInput) (*dynamodb.ScanOutput, error)
-// }
-
 func main() {
 	if err := f.Parse(os.Args[1:]); err != nil {
-		fmt.Fprint(os.Stderr, err.Error())
+		fmt.Println("hmm")
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(exitCodeFlagParseError)
 	}
 
+	if *helpFlag == true {
+		fmt.Print(helpString)
+		os.Exit(exitCodeOk)
+	}
+
+	if *versionFlag == true {
+		fmt.Println(Version)
+		os.Exit(exitCodeOk)
+	}
+
 	if *tableFlag == "" {
-		fmt.Fprint(os.Stderr, "Error: Missing table name")
+		fmt.Fprintln(os.Stderr, "Error: Missing table name")
 		os.Exit(exitCodeFlagParseError)
 	}
 
