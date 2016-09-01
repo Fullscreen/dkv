@@ -26,7 +26,7 @@ const helpString = `Usage:
   dkv [-hiv] [--table=dynamo_table] [--delete=key] [--region=region] [key=value]
 
 Flags:
-  -d, --help    Print this help message
+  -d, --delete  Delete a key
   -h, --help    Print this help message
   -r, --region  The AWS region the table is in
   -t, --table   The name of the DynamoDB table
