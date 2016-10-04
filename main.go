@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -106,8 +107,13 @@ func main() {
 			fmt.Print(err.Error())
 			os.Exit(exitCodeError)
 		}
+		var items []string
 		for _, item := range resp.Items {
-			fmt.Printf("%s=%s\n", *item["Name"].S, *item["Value"].S)
+			items = append(items, fmt.Sprintf("%s=%s", *item["Name"].S, *item["Value"].S))
+		}
+		sort.Strings(items)
+		for _, ln := range items {
+			fmt.Println(ln)
 		}
 		os.Exit(exitCodeOk)
 	}
